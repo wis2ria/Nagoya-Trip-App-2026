@@ -290,11 +290,11 @@ const ItineraryView = ({
       )}
 
       {currentDay.ticketGuide && (
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-3xl shadow-sm border border-blue-100 mb-6">
-          <div className="flex items-center gap-2 mb-3 text-blue-800 font-bold">
+        <div className="bg-gradient-to-br from-[#A39D78]/5 to-[#773690]/5 p-5 rounded-3xl shadow-sm border border-[#A39D78]/10 mb-6">
+          <div className="flex items-center gap-2 mb-3 text-[#A39D78] font-bold">
             <Ticket size={20} /> {currentDay.ticketGuide.title}
           </div>
-          <p className="text-sm text-blue-700 whitespace-pre-wrap leading-relaxed mb-4">
+          <p className="text-sm text-[#4A4737] whitespace-pre-wrap leading-relaxed mb-4">
             {currentDay.ticketGuide.description}
           </p>
           {currentDay.ticketGuide.links && (
@@ -305,7 +305,7 @@ const ItineraryView = ({
                   href={link.url} 
                   target="_blank" 
                   rel="noreferrer"
-                  className="px-3 py-2 bg-white/80 rounded-xl text-xs font-bold text-blue-600 border border-blue-200 flex items-center gap-1.5 hover:bg-white transition-colors"
+                  className="px-3 py-2 bg-white/80 rounded-xl text-xs font-bold text-[#773690] border border-[#773690]/10 flex items-center gap-1.5 hover:bg-white transition-colors"
                 >
                   {link.type === 'image' ? <ImageIcon size={14}/> : <FileText size={14}/>}
                   {link.text}
@@ -322,13 +322,13 @@ const ItineraryView = ({
           const isStrategy = place.type === '攻略';
           return (
             <React.Fragment key={place.id}>
-              <div className={`p-5 rounded-3xl shadow-sm border relative group transition-all hover:shadow-md ${isStrategy ? 'bg-gradient-to-r from-orange-50 to-yellow-50 border-orange-100' : 'bg-white border-gray-100'}`}>
+              <div className={`p-5 rounded-3xl shadow-sm border relative group transition-all hover:shadow-md ${isStrategy ? 'bg-gradient-to-r from-[#773690]/5 to-[#A39D78]/5 border-[#773690]/10' : 'bg-white border-gray-100'}`}>
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-2xl ${isStrategy ? 'bg-orange-500 text-white' : 'bg-[#A39D78]/10 text-[#A39D78]'}`}>
+                    <div className={`p-2 rounded-2xl ${isStrategy ? 'bg-[#773690] text-white' : 'bg-[#A39D78]/10 text-[#A39D78]'}`}>
                       {getIconForType(place.type, "")}
                     </div>
-                    <h3 className={`font-bold text-lg ${isStrategy ? 'text-orange-800' : 'text-[#4A4737]'}`}>{place.name}</h3>
+                    <h3 className={`font-bold text-lg ${isStrategy ? 'text-[#773690]' : 'text-[#4A4737]'}`}>{place.name}</h3>
                   </div>
                   <button onClick={() => setActiveMenuIdx(activeMenuIdx === idx ? null : idx)} className="p-1 text-gray-300 hover:text-gray-600">
                     <MoreVertical size={20} />
@@ -371,7 +371,7 @@ const ItineraryView = ({
                     </div>
                   )}
                 </div>
-                <p className={`text-sm mb-4 whitespace-pre-wrap leading-relaxed ${isStrategy ? 'text-orange-700' : 'text-gray-600'}`}>{place.description}</p>
+                <p className={`text-sm mb-4 whitespace-pre-wrap leading-relaxed ${isStrategy ? 'text-[#773690]/80' : 'text-gray-600'}`}>{place.description}</p>
                 
                 {place.badges && place.badges.length > 0 && (
                   <div className="flex flex-wrap gap-2 mb-4">
@@ -412,13 +412,13 @@ const ItineraryView = ({
                     {loadingTips[place.name] ? <Loader2 size={14} className="animate-spin mx-auto" /> : '✨ AI 探索'}
                   </button>
                   {!isStrategy && (
-                    <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name)}`} target="_blank" rel="noreferrer" className="flex-1 bg-gray-50 text-gray-500 py-2.5 rounded-xl text-xs font-bold text-center flex items-center justify-center gap-1">
+                    <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name)}`} target="_blank" rel="noreferrer" className="flex-1 bg-gray-50 text-gray-400 py-2.5 rounded-xl text-xs font-bold text-center flex items-center justify-center gap-1">
                       <Navigation size={14}/> 導航
                     </a>
                   )}
                 </div>
                 {aiTips[place.name] && (
-                  <div className="mt-4 p-4 bg-purple-50 rounded-2xl text-xs text-purple-700 border border-purple-100 animate-in slide-in-from-top-2">
+                  <div className="mt-4 p-4 bg-[#773690]/5 rounded-2xl text-xs text-[#773690] border border-[#773690]/10 animate-in slide-in-from-top-2">
                     <div className="font-bold mb-1 flex items-center gap-1"><Info size={12}/> AI 建議</div>
                     {aiTips[place.name]}
                   </div>
@@ -670,7 +670,7 @@ const GuideView = ({ user, packingList, setPackingList, updateFirestore, showToa
                   <div className="font-bold text-[#4A4737]">台北駐日經濟文化代表處</div>
                   <div className="text-xs text-gray-400">+81 3 3280 7811</div>
                 </div>
-                <button onClick={() => { navigator.clipboard.writeText('+81332807811'); showToast('已複製電話'); }} className="p-3 bg-white rounded-full shadow-sm text-blue-500 hover:bg-blue-50 transition-colors"><Copy size={18}/></button>
+                <button onClick={() => { navigator.clipboard.writeText('+81332807811'); showToast('已複製電話'); }} className="p-3 bg-white rounded-full shadow-sm text-[#773690] hover:bg-[#773690]/5 transition-colors"><Copy size={18}/></button>
               </div>
             </div>
             <button onClick={() => setEmergencyModal(false)} className="w-full py-4 bg-gray-100 rounded-2xl font-bold text-gray-500">關閉</button>
@@ -799,7 +799,7 @@ export default function App() {
       {toast && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[100] animate-in slide-in-from-top-10">
           <div className={`px-6 py-3 rounded-2xl shadow-xl text-white font-bold flex items-center gap-2 ${
-            toast.type === 'error' ? 'bg-red-500' : toast.type === 'info' ? 'bg-blue-500' : 'bg-[#A39D78]'
+            toast.type === 'error' ? 'bg-red-500' : toast.type === 'info' ? 'bg-[#773690]' : 'bg-[#A39D78]'
           }`}>
             {toast.type === 'success' && <CheckCheck size={18}/>}
             {toast.message}
