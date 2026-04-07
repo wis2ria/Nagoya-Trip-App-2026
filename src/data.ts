@@ -4,8 +4,8 @@ export const mockData = {
   "tripInfo": {
     "title": "✈️ 名古屋6天5夜放鬆之旅",
     "dates": "2026/04/21 - 2026/04/26",
-    "themeColor": "#773690",
-    "accentColor": "#A39D78"
+    "themeColor": "#A39D78",
+    "accentColor": "#773690"
   },
   "documents": [
     { title: "機票 (CHENG)", url: "https://drive.google.com/file/d/1m9BJ5Pdmh1uPSz1dFAdeRJhzz6MMH8qn/view?usp=drive_link", icon: "Plane" },

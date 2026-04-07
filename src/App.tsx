@@ -108,16 +108,16 @@ const getDocColorClass = (iconName: string) => {
 const LoginScreen = () => {
   const handleLogin = () => signInWithPopup(auth, googleProvider);
   return (
-    <div className="h-full flex flex-col items-center justify-center p-8 bg-gradient-to-br from-[#773690] to-[#A39D78] text-white">
+    <div className="h-full flex flex-col items-center justify-center p-8 bg-gradient-to-br from-[#A39D78] to-[#773690] text-white">
       <div className="bg-white/20 backdrop-blur-lg p-10 rounded-[3rem] shadow-2xl border border-white/30 flex flex-col items-center text-center">
         <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-6 shadow-lg">
-          <Plane className="text-[#773690]" size={48} />
+          <Plane className="text-[#A39D78]" size={48} />
         </div>
         <h1 className="text-3xl font-bold mb-2">名古屋旅遊手冊</h1>
         <p className="text-white/80 mb-8 max-w-[200px]">登入以儲存您的專屬行程與清單</p>
         <button 
           onClick={handleLogin}
-          className="flex items-center gap-3 bg-white text-gray-800 px-8 py-4 rounded-2xl font-bold shadow-xl hover:bg-gray-50 transition-all active:scale-95"
+          className="flex items-center gap-3 bg-white text-[#4A4737] px-8 py-4 rounded-2xl font-bold shadow-xl hover:bg-gray-50 transition-all active:scale-95"
         >
           <LogIn size={20} /> 使用 Google 登入
         </button>
@@ -205,7 +205,7 @@ const ItineraryView = ({
           <button 
             key={idx} 
             onClick={() => setSelectedDayIdx(idx)} 
-            className={`py-2.5 rounded-xl text-[11px] font-bold transition-all text-center ${selectedDayIdx === idx ? 'bg-[#773690] text-white shadow-md scale-105' : 'bg-white text-gray-400 border border-gray-100'}`}
+            className={`py-2.5 rounded-xl text-[11px] font-bold transition-all text-center ${selectedDayIdx === idx ? 'bg-[#A39D78] text-white shadow-md scale-105' : 'bg-white text-gray-400 border border-gray-100'}`}
           >
             {day.day.replace('Day ', 'D')}
           </button>
@@ -213,13 +213,13 @@ const ItineraryView = ({
       </div>
 
       <div className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 mb-6">
-        <h2 className="text-xl font-bold text-[#773690] mb-2">{currentDay.dateInfo}</h2>
+        <h2 className="text-xl font-bold text-[#A39D78] mb-2">{currentDay.dateInfo}</h2>
         <div className="flex flex-col gap-2 text-sm text-gray-500">
           <div className="flex items-center gap-2 bg-gray-50 p-2 rounded-xl">
-            <Sun size={16} className="text-[#A39D78]" /> {currentDay.weatherHint}
+            <Sun size={16} className="text-[#773690]" /> {currentDay.weatherHint}
           </div>
           <div className="flex items-center gap-2 bg-gray-50 p-2 rounded-xl">
-            <Umbrella size={16} className="text-[#A39D78]" /> {currentDay.clothingHint}
+            <Umbrella size={16} className="text-[#773690]" /> {currentDay.clothingHint}
           </div>
         </div>
       </div>
@@ -231,10 +231,37 @@ const ItineraryView = ({
       {currentDay.parkMapUrl && (
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 mb-6 overflow-hidden cursor-pointer group" onClick={() => setPreviewImage(currentDay.parkMapUrl)}>
           <div className="p-4 flex justify-between items-center border-b border-gray-50">
-            <span className="text-sm font-bold text-[#773690] flex items-center gap-2"><MapIcon size={16}/> 園區導覽地圖</span>
-            <ZoomIn size={16} className="text-gray-300 group-hover:text-[#773690] transition-colors" />
+            <span className="text-sm font-bold text-[#A39D78] flex items-center gap-2"><MapIcon size={16}/> 園區導覽地圖</span>
+            <ZoomIn size={16} className="text-gray-300 group-hover:text-[#A39D78] transition-colors" />
           </div>
           <img src={currentDay.parkMapUrl} alt="park map" className="w-full h-auto" />
+        </div>
+      )}
+
+      {currentDay.ticketGuide && (
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-3xl shadow-sm border border-blue-100 mb-6">
+          <div className="flex items-center gap-2 mb-3 text-blue-800 font-bold">
+            <Ticket size={20} /> {currentDay.ticketGuide.title}
+          </div>
+          <p className="text-sm text-blue-700 whitespace-pre-wrap leading-relaxed mb-4">
+            {currentDay.ticketGuide.description}
+          </p>
+          {currentDay.ticketGuide.links && (
+            <div className="flex flex-wrap gap-2">
+              {currentDay.ticketGuide.links.map((link: any, lIdx: number) => (
+                <a 
+                  key={lIdx} 
+                  href={link.url} 
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="px-3 py-2 bg-white/80 rounded-xl text-xs font-bold text-blue-600 border border-blue-200 flex items-center gap-1.5 hover:bg-white transition-colors"
+                >
+                  {link.type === 'image' ? <ImageIcon size={14}/> : <FileText size={14}/>}
+                  {link.text}
+                </a>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -245,10 +272,10 @@ const ItineraryView = ({
             <div key={place.id} className={`p-5 rounded-3xl shadow-sm border relative group transition-all hover:shadow-md ${isStrategy ? 'bg-gradient-to-r from-orange-50 to-yellow-50 border-orange-100' : 'bg-white border-gray-100'}`}>
               <div className="flex justify-between items-start mb-3">
                 <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-2xl ${isStrategy ? 'bg-orange-500 text-white' : 'bg-[#773690]/10 text-[#773690]'}`}>
+                  <div className={`p-2 rounded-2xl ${isStrategy ? 'bg-orange-500 text-white' : 'bg-[#A39D78]/10 text-[#A39D78]'}`}>
                     {getIconForType(place.type, "")}
                   </div>
-                  <h3 className={`font-bold text-lg ${isStrategy ? 'text-orange-800' : 'text-gray-800'}`}>{place.name}</h3>
+                  <h3 className={`font-bold text-lg ${isStrategy ? 'text-orange-800' : 'text-[#4A4737]'}`}>{place.name}</h3>
                 </div>
                 <button onClick={() => setActiveMenuIdx(activeMenuIdx === idx ? null : idx)} className="p-1 text-gray-300 hover:text-gray-600">
                   <MoreVertical size={20} />
@@ -310,8 +337,18 @@ const ItineraryView = ({
               {place.goshuins && (
                 <div className="flex flex-wrap gap-2 mb-4">
                   {place.goshuins.map((gs: any, gIdx: number) => (
-                    <div key={gIdx} className="inline-flex items-center gap-1.5 bg-[#773690]/10 text-[#773690] px-2.5 py-1.5 rounded-xl text-[10px] font-bold border border-[#773690]/20 shadow-sm">
+                    <div key={gIdx} className="inline-flex items-center gap-1.5 bg-[#A39D78]/10 text-[#A39D78] px-2.5 py-1.5 rounded-xl text-[10px] font-bold border border-[#A39D78]/20 shadow-sm">
                       ⛩️ {gs.name} ({gs.price})
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {place.gojoins && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {place.gojoins.map((gj: any, gIdx: number) => (
+                    <div key={gIdx} className="inline-flex items-center gap-1.5 bg-[#773690]/10 text-[#773690] px-2.5 py-1.5 rounded-xl text-[10px] font-bold border border-[#773690]/20 shadow-sm">
+                      🏯 {gj.name} ({gj.price})
                     </div>
                   ))}
                 </div>
@@ -336,25 +373,25 @@ const ItineraryView = ({
             </div>
           );
         })}
-        <button onClick={() => openEditModal()} className="w-full py-5 border-2 border-dashed border-gray-200 rounded-[2rem] text-gray-400 font-bold hover:border-[#773690] hover:text-[#773690] transition-all flex items-center justify-center gap-2 bg-white/50">
+        <button onClick={() => openEditModal()} className="w-full py-5 border-2 border-dashed border-gray-200 rounded-[2rem] text-gray-400 font-bold hover:border-[#A39D78] hover:text-[#A39D78] transition-all flex items-center justify-center gap-2 bg-white/50">
           <Plus size={20} /> 新增行程卡片
         </button>
       </div>
 
       <div className="mt-10 mb-10">
         {dailyJournals[selectedDayIdx] ? (
-          <div className="bg-gradient-to-br from-pink-50 to-purple-50 p-6 rounded-[2rem] border border-pink-100 shadow-sm animate-in zoom-in-95">
+          <div className="bg-gradient-to-br from-[#A39D78]/10 to-[#773690]/10 p-6 rounded-[2rem] border border-[#A39D78]/20 shadow-sm animate-in zoom-in-95">
             <div className="flex justify-between items-center mb-4">
               <span className="text-sm font-bold text-[#773690] flex items-center gap-2">✨ 專屬 IG 貼文</span>
               <button onClick={() => setDailyJournals({...dailyJournals, [selectedDayIdx]: null})} className="text-gray-400"><X size={16}/></button>
             </div>
-            <p className="text-sm text-gray-700 bg-white/50 p-4 rounded-2xl mb-4 whitespace-pre-wrap">{dailyJournals[selectedDayIdx]}</p>
-            <button onClick={() => { navigator.clipboard.writeText(dailyJournals[selectedDayIdx]); setCopiedJournal(true); setTimeout(()=>setCopiedJournal(false), 2000); }} className="w-full py-3 bg-white border border-purple-100 rounded-xl text-[#773690] font-bold text-sm flex items-center justify-center gap-2">
+            <p className="text-sm text-[#4A4737] bg-white/50 p-4 rounded-2xl mb-4 whitespace-pre-wrap">{dailyJournals[selectedDayIdx]}</p>
+            <button onClick={() => { navigator.clipboard.writeText(dailyJournals[selectedDayIdx]); setCopiedJournal(true); setTimeout(()=>setCopiedJournal(false), 2000); }} className="w-full py-3 bg-white border border-[#773690]/20 rounded-xl text-[#773690] font-bold text-sm flex items-center justify-center gap-2">
               {copiedJournal ? <Check size={16} className="text-green-500"/> : <Copy size={16}/>} {copiedJournal ? '已複製' : '複製貼文'}
             </button>
           </div>
         ) : (
-          <button onClick={() => setShowJournalForm(true)} className="w-full py-4 bg-gradient-to-r from-purple-100 to-pink-100 rounded-[2rem] text-[#773690] font-bold text-sm shadow-sm hover:shadow-md transition-all">
+          <button onClick={() => setShowJournalForm(true)} className="w-full py-4 bg-gradient-to-r from-[#A39D78]/20 to-[#773690]/20 rounded-[2rem] text-[#773690] font-bold text-sm shadow-sm hover:shadow-md transition-all">
             ✨ 讓 AI 幫我寫今日 IG 貼文
           </button>
         )}
@@ -364,13 +401,13 @@ const ItineraryView = ({
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-md rounded-[2.5rem] p-6 shadow-2xl">
             <div className="flex justify-between items-center mb-6">
-              <h3 className="font-bold text-[#773690]">訂製 IG 貼文</h3>
+              <h3 className="font-bold text-[#A39D78]">訂製 IG 貼文</h3>
               <button onClick={() => setShowJournalForm(false)}><X size={24}/></button>
             </div>
-            <textarea value={journalMood} onChange={e => setJournalMood(e.target.value)} placeholder="今天的心情或特別的事..." className="w-full p-4 bg-gray-50 rounded-2xl mb-4 h-24 border-none focus:ring-2 focus:ring-[#773690]" />
+            <textarea value={journalMood} onChange={e => setJournalMood(e.target.value)} placeholder="今天的心情或特別的事..." className="w-full p-4 bg-gray-50 rounded-2xl mb-4 h-24 border-none focus:ring-2 focus:ring-[#A39D78]" />
             <div className="flex gap-2 mb-6">
               {['活潑', '文青', '幽默'].map(s => (
-                <button key={s} onClick={() => setJournalStyle(s)} className={`flex-1 py-2 rounded-xl font-bold text-xs ${journalStyle === s ? 'bg-[#773690] text-white' : 'bg-gray-50 text-gray-400'}`}>{s}</button>
+                <button key={s} onClick={() => setJournalStyle(s)} className={`flex-1 py-2 rounded-xl font-bold text-xs ${journalStyle === s ? 'bg-[#A39D78] text-white' : 'bg-gray-50 text-gray-400'}`}>{s}</button>
               ))}
             </div>
             <button onClick={handleGenerateJournal} disabled={isGeneratingJournal} className="w-full py-4 bg-[#773690] text-white rounded-2xl font-bold shadow-lg flex items-center justify-center gap-2">
@@ -383,26 +420,26 @@ const ItineraryView = ({
       {editModal.isOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-md rounded-[2.5rem] overflow-hidden shadow-2xl">
-            <div className="p-6 bg-[#773690] text-white flex justify-between items-center">
+            <div className="p-6 bg-[#A39D78] text-white flex justify-between items-center">
               <h3 className="font-bold">編輯行程</h3>
               <button onClick={() => setEditModal({ isOpen: false })}><X size={24} /></button>
             </div>
             <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto hide-scrollbar">
               <div>
                 <label className="text-xs font-bold text-gray-400 ml-1">標題</label>
-                <input type="text" value={editModal.data.name} onChange={e => setEditModal({...editModal, data: {...editModal.data, name: e.target.value}})} placeholder="標題" className="w-full p-3 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#773690]" />
+                <input type="text" value={editModal.data.name} onChange={e => setEditModal({...editModal, data: {...editModal.data, name: e.target.value}})} placeholder="標題" className="w-full p-3 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#A39D78]" />
               </div>
               <div>
                 <label className="text-xs font-bold text-gray-400 ml-1">描述</label>
-                <textarea value={editModal.data.description} onChange={e => setEditModal({...editModal, data: {...editModal.data, description: e.target.value}})} placeholder="描述" className="w-full p-3 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#773690] h-32" />
+                <textarea value={editModal.data.description} onChange={e => setEditModal({...editModal, data: {...editModal.data, description: e.target.value}})} placeholder="描述" className="w-full p-3 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#A39D78] h-32" />
               </div>
               <div>
                 <label className="text-xs font-bold text-gray-400 ml-1">標籤 (逗號分隔)</label>
-                <input type="text" value={editModal.data.badges} onChange={e => setEditModal({...editModal, data: {...editModal.data, badges: e.target.value}})} placeholder="標籤 (逗號分隔)" className="w-full p-3 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#773690]" />
+                <input type="text" value={editModal.data.badges} onChange={e => setEditModal({...editModal, data: {...editModal.data, badges: e.target.value}})} placeholder="標籤 (逗號分隔)" className="w-full p-3 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#A39D78]" />
               </div>
             </div>
             <div className="p-6">
-              <button onClick={saveEditModal} className="w-full bg-[#773690] text-white py-4 rounded-2xl font-bold shadow-lg">儲存行程</button>
+              <button onClick={saveEditModal} className="w-full bg-[#A39D78] text-white py-4 rounded-2xl font-bold shadow-lg">儲存行程</button>
             </div>
           </div>
         </div>
@@ -478,12 +515,12 @@ const GuideView = ({ user, packingList, setPackingList, updateFirestore, showToa
       </div>
 
       <div className="bg-white rounded-[2.5rem] p-6 shadow-sm border border-gray-100 mb-6">
-        <div className="flex items-center gap-2 mb-4 text-[#773690] font-bold">
+        <div className="flex items-center gap-2 mb-4 text-[#A39D78] font-bold">
           <MessageCircle size={20}/> 隨身翻譯蒟蒻
         </div>
         <div className="flex flex-wrap gap-2 mb-4">
           {['謝謝', '多少錢？', '廁所在哪？', '可以拍照嗎？'].map(phrase => (
-            <button key={phrase} onClick={() => { setTranslateInput(phrase); }} className="px-3 py-1.5 bg-gray-50 text-gray-500 rounded-xl text-xs hover:bg-[#773690]/10 hover:text-[#773690] transition-colors">
+            <button key={phrase} onClick={() => { setTranslateInput(phrase); }} className="px-3 py-1.5 bg-gray-50 text-gray-500 rounded-xl text-xs hover:bg-[#A39D78]/10 hover:text-[#A39D78] transition-colors">
               {phrase}
             </button>
           ))}
@@ -512,7 +549,7 @@ const GuideView = ({ user, packingList, setPackingList, updateFirestore, showToa
                 <Copy size={16}/>
               </button>
             </div>
-            <div className="text-lg font-bold text-gray-800 mb-1 pr-20">{translateResult.jp}</div>
+            <div className="text-lg font-bold text-[#4A4737] mb-1 pr-20">{translateResult.jp}</div>
             <div className="text-xs text-gray-400 mb-3">{translateResult.romaji}</div>
             <div className="text-xs text-[#A39D78] bg-white p-2 rounded-xl border border-gray-50">{translateResult.tip}</div>
           </div>
@@ -520,8 +557,8 @@ const GuideView = ({ user, packingList, setPackingList, updateFirestore, showToa
       </div>
 
       <div className="bg-white rounded-[2.5rem] p-6 shadow-sm border border-gray-100">
-        <div className="flex items-center gap-2 mb-6 text-[#773690] font-bold">
-          <ShoppingBag size={20}/> 行李打包與購物
+        <div className="flex items-center gap-2 mb-6 text-[#A39D78] font-bold">
+          <ShoppingBag size={20}/> 行記打包與購物
         </div>
         <div className="flex gap-2 mb-6">
           {['carryOn', 'checked', 'shopping'].map(cat => (
@@ -538,7 +575,7 @@ const GuideView = ({ user, packingList, setPackingList, updateFirestore, showToa
                 <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${item.checked ? 'bg-[#773690] border-[#773690]' : 'border-gray-200'}`}>
                   {item.checked && <Check size={16} className="text-white" />}
                 </div>
-                <span className={`font-medium transition-all ${item.checked ? 'text-gray-300 line-through' : 'text-gray-700'}`}>{item.text}</span>
+                <span className={`font-medium transition-all ${item.checked ? 'text-gray-300 line-through' : 'text-[#4A4737]'}`}>{item.text}</span>
               </label>
               <button onClick={() => {
                 const newList = { ...packingList, [activeCat]: packingList[activeCat].filter((i: any) => i.id !== item.id) };
@@ -594,7 +631,7 @@ const WeatherView = () => {
 
   return (
     <div className="h-full overflow-y-auto p-4 pb-24 hide-scrollbar">
-      <h2 className="text-xl font-bold text-[#773690] mb-6 flex items-center gap-2 px-2"><Sun/> 每日天氣預測</h2>
+      <h2 className="text-xl font-bold text-[#A39D78] mb-6 flex items-center gap-2 px-2"><Sun/> 每日天氣預測</h2>
       <div className="space-y-4">
         {forecast.map((w, i) => (
           <div key={i} className="bg-white p-5 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-4 transition-all hover:shadow-md">
@@ -604,7 +641,7 @@ const WeatherView = () => {
               <span className="text-sm font-bold mt-1">{w.temp}</span>
             </div>
             <div className="flex-1 border-l border-gray-50 pl-4">
-              <div className="font-bold text-[#A39D78] mb-1">{w.desc}</div>
+              <div className="font-bold text-[#773690] mb-1">{w.desc}</div>
               <div className="text-[11px] text-gray-500 leading-relaxed bg-gray-50 p-2 rounded-xl">{w.clothingHint}</div>
             </div>
           </div>
@@ -675,8 +712,8 @@ export default function App() {
     <div className="h-screen flex flex-col bg-[#FAF9F6] max-w-md mx-auto shadow-2xl relative overflow-hidden">
       <header className="bg-white px-6 py-5 shadow-sm flex items-center justify-between z-20 border-b border-gray-100">
         <div>
-          <h1 className="text-lg font-bold text-[#773690]">{mockData.tripInfo.title}</h1>
-          <p className="text-xs text-[#A39D78] font-bold">{user.displayName} 的專屬手冊</p>
+          <h1 className="text-lg font-bold text-[#A39D78]">{mockData.tripInfo.title}</h1>
+          <p className="text-xs text-[#773690] font-bold">{user.displayName} 的專屬手冊</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={() => {
@@ -686,7 +723,7 @@ export default function App() {
               updateFirestoreItinerary(freshData);
               showToast('已重設為官方 6 天行程');
             });
-          }} className="p-2 text-[#A39D78] hover:text-[#773690] transition-colors" title="重設行程">
+          }} className="p-2 text-[#773690] hover:text-[#A39D78] transition-colors" title="重設行程">
             <RefreshCw size={20} />
           </button>
           <button onClick={() => signOut(auth)} className="p-2 text-gray-300 hover:text-red-500 transition-colors"><LogOut size={20} /></button>
@@ -696,7 +733,7 @@ export default function App() {
       {toast && (
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[100] animate-in slide-in-from-top-10">
           <div className={`px-6 py-3 rounded-2xl shadow-xl text-white font-bold flex items-center gap-2 ${
-            toast.type === 'error' ? 'bg-red-500' : toast.type === 'info' ? 'bg-blue-500' : 'bg-[#773690]'
+            toast.type === 'error' ? 'bg-red-500' : toast.type === 'info' ? 'bg-blue-500' : 'bg-[#A39D78]'
           }`}>
             {toast.type === 'success' && <CheckCheck size={18}/>}
             {toast.message}
@@ -729,15 +766,15 @@ export default function App() {
       </main>
 
       <nav className="bg-white border-t border-gray-100 flex justify-around p-4 pb-8 z-20 shadow-[0_-4px_20px_rgba(0,0,0,0.02)]">
-        <button onClick={() => setActiveTab('itinerary')} className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'itinerary' ? 'text-[#773690] scale-110' : 'text-gray-300'}`}>
+        <button onClick={() => setActiveTab('itinerary')} className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'itinerary' ? 'text-[#A39D78] scale-110' : 'text-gray-300'}`}>
           <MapPin size={24} strokeWidth={activeTab === 'itinerary' ? 3 : 2} />
           <span className="text-[10px] font-bold">行程</span>
         </button>
-        <button onClick={() => setActiveTab('guide')} className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'guide' ? 'text-[#773690] scale-110' : 'text-gray-300'}`}>
+        <button onClick={() => setActiveTab('guide')} className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'guide' ? 'text-[#A39D78] scale-110' : 'text-gray-300'}`}>
           <FileText size={24} strokeWidth={activeTab === 'guide' ? 3 : 2} />
           <span className="text-[10px] font-bold">指南</span>
         </button>
-        <button onClick={() => setActiveTab('weather')} className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'weather' ? 'text-[#773690] scale-110' : 'text-gray-300'}`}>
+        <button onClick={() => setActiveTab('weather')} className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'weather' ? 'text-[#A39D78] scale-110' : 'text-gray-300'}`}>
           <Sun size={24} strokeWidth={activeTab === 'weather' ? 3 : 2} />
           <span className="text-[10px] font-bold">天氣</span>
         </button>
@@ -754,7 +791,7 @@ export default function App() {
         <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
           <div className="bg-white w-full max-w-sm rounded-[2.5rem] overflow-hidden shadow-2xl">
             <div className="p-6 bg-gray-50 border-b border-gray-100">
-              <h3 className="font-bold text-gray-800 text-lg">{confirmModal.title}</h3>
+              <h3 className="font-bold text-[#4A4737] text-lg">{confirmModal.title}</h3>
             </div>
             <div className="p-6">
               <p className="text-gray-600 text-sm leading-relaxed">{confirmModal.message}</p>
@@ -768,7 +805,7 @@ export default function App() {
               </button>
               <button 
                 onClick={() => { confirmModal.onConfirm(); setConfirmModal(null); }}
-                className="flex-1 py-3 bg-[#773690] text-white rounded-2xl font-bold text-sm shadow-lg shadow-[#773690]/20"
+                className="flex-1 py-3 bg-[#A39D78] text-white rounded-2xl font-bold text-sm shadow-lg shadow-[#A39D78]/20"
               >
                 確定
               </button>
