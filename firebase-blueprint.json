@@ -1,0 +1,32 @@
+{
+  "entities": {
+    "PackingList": {
+      "title": "Packing List",
+      "description": "User's personal packing and shopping list",
+      "type": "object",
+      "properties": {
+        "carryOn": { "type": "array" },
+        "checked": { "type": "array" },
+        "shopping": { "type": "array" }
+      }
+    },
+    "Itinerary": {
+      "title": "Itinerary",
+      "description": "User's personal itinerary data",
+      "type": "object",
+      "properties": {
+        "data": { "type": "array" }
+      }
+    }
+  },
+  "firestore": {
+    "artifacts/{appId}/users/{userId}/settings/packingList": {
+      "schema": "PackingList",
+      "description": "User's personal packing list"
+    },
+    "artifacts/{appId}/users/{userId}/settings/itinerary": {
+      "schema": "Itinerary",
+      "description": "User's personal itinerary"
+    }
+  }
+}
