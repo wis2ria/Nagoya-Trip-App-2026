@@ -103,6 +103,57 @@ const getDocColorClass = (iconName: string) => {
   }
 };
 
+const ScrollToTop = ({ activeTab, itineraryRef, guideRef, weatherRef }: any) => {
+  const [show, setShow] = useState(false);
+  
+  useEffect(() => {
+    const refs: any = { itinerary: itineraryRef, guide: guideRef, weather: weatherRef };
+    const container = refs[activeTab]?.current;
+    
+    if (!container) {
+      setShow(false);
+      return;
+    }
+
+    const handleScroll = () => {
+      setShow(container.scrollTop > container.clientHeight / 2);
+    };
+
+    // 初始檢查
+    handleScroll();
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [activeTab, itineraryRef, guideRef, weatherRef]);
+
+  const scrollToTop = () => {
+    const refs: any = { itinerary: itineraryRef, guide: guideRef, weather: weatherRef };
+    refs[activeTab]?.current?.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  if (!show) return null;
+
+  return (
+    <button
+      onClick={scrollToTop}
+      className="absolute bottom-24 right-6 p-4 bg-[#A39D78]/30 text-white/50 backdrop-blur-md rounded-full shadow-2xl z-50 animate-in fade-in slide-in-from-bottom-4 hover:scale-110 hover:bg-[#A39D78]/50 hover:text-white/70 active:scale-95 transition-all"
+    >
+      <ChevronUp size={24} strokeWidth={3} />
+    </button>
+  );
+};
+
+const InsertButton = ({ onClick }: { onClick: () => void }) => (
+  <div className="group relative py-2 -my-2 flex items-center justify-center cursor-pointer z-10" onClick={onClick}>
+    <div className="w-full h-px bg-[#A39D78]/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all scale-75 group-hover:scale-100">
+      <div className="bg-[#A39D78] text-white p-1.5 rounded-full shadow-lg border-2 border-white">
+        <Plus size={18} strokeWidth={3} />
+      </div>
+    </div>
+  </div>
+);
+
 // --- COMPONENTS ---
 
 const LoginScreen = () => {
@@ -128,12 +179,12 @@ const LoginScreen = () => {
 
 const ItineraryView = ({ 
   user, dailyJournals, setDailyJournals,
-  aiTips, setAiTips, setPreviewImage, itineraryData, setItineraryData, updateFirestoreItinerary, showToast, showConfirm
+  aiTips, setAiTips, setPreviewImage, itineraryData, setItineraryData, updateFirestoreItinerary, showToast, showConfirm,
+  scrollRef
 }: any) => {
   const [selectedDayIdx, setSelectedDayIdx] = useState(0);
   const currentDay = itineraryData[selectedDayIdx];
   
-  const viewRef = useRef<HTMLDivElement>(null);
   const [loadingTips, setLoadingTips] = useState<any>({});
 
   const [isGeneratingJournal, setIsGeneratingJournal] = useState(false);
@@ -147,10 +198,10 @@ const ItineraryView = ({
   const [editModal, setEditModal] = useState<any>({ isOpen: false, placeIdx: null, insertIdx: null, data: null });
 
   useEffect(() => {
-    if (viewRef.current) viewRef.current.scrollTop = 0;
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
     setShowJournalForm(false);
     setActiveMenuIdx(null); 
-  }, [selectedDayIdx]);
+  }, [selectedDayIdx, scrollRef]);
 
   const handleAiExplore = async (placeName: string, placeType: string) => {
     if (loadingTips[placeName]) return;
@@ -199,7 +250,7 @@ const ItineraryView = ({
   const mapEmbedUrl = `https://maps.google.com/maps?q=${encodeURIComponent(currentDay.mapKeyword || currentDay.places[0]?.name)}&t=&z=13&ie=UTF8&iwloc=&output=embed`;
 
   return (
-    <div className="h-full overflow-y-auto p-4 pb-24 hide-scrollbar" ref={viewRef}>
+    <div className="h-full overflow-y-auto p-4 pb-24 hide-scrollbar" ref={scrollRef}>
       <div className="grid grid-cols-6 gap-1.5 mb-6">
         {itineraryData.map((day: any, idx: number) => (
           <button 
@@ -266,116 +317,117 @@ const ItineraryView = ({
       )}
 
       <div className="space-y-4">
+        <InsertButton onClick={() => openEditModal(null, null, 0)} />
         {currentDay.places.map((place: any, idx: number) => {
           const isStrategy = place.type === '攻略';
           return (
-            <div key={place.id} className={`p-5 rounded-3xl shadow-sm border relative group transition-all hover:shadow-md ${isStrategy ? 'bg-gradient-to-r from-orange-50 to-yellow-50 border-orange-100' : 'bg-white border-gray-100'}`}>
-              <div className="flex justify-between items-start mb-3">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-2xl ${isStrategy ? 'bg-orange-500 text-white' : 'bg-[#A39D78]/10 text-[#A39D78]'}`}>
-                    {getIconForType(place.type, "")}
+            <React.Fragment key={place.id}>
+              <div className={`p-5 rounded-3xl shadow-sm border relative group transition-all hover:shadow-md ${isStrategy ? 'bg-gradient-to-r from-orange-50 to-yellow-50 border-orange-100' : 'bg-white border-gray-100'}`}>
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-2xl ${isStrategy ? 'bg-orange-500 text-white' : 'bg-[#A39D78]/10 text-[#A39D78]'}`}>
+                      {getIconForType(place.type, "")}
+                    </div>
+                    <h3 className={`font-bold text-lg ${isStrategy ? 'text-orange-800' : 'text-[#4A4737]'}`}>{place.name}</h3>
                   </div>
-                  <h3 className={`font-bold text-lg ${isStrategy ? 'text-orange-800' : 'text-[#4A4737]'}`}>{place.name}</h3>
+                  <button onClick={() => setActiveMenuIdx(activeMenuIdx === idx ? null : idx)} className="p-1 text-gray-300 hover:text-gray-600">
+                    <MoreVertical size={20} />
+                  </button>
+                  {activeMenuIdx === idx && (
+                    <div className="absolute right-4 top-12 bg-white shadow-xl border border-gray-100 rounded-2xl py-2 z-10 w-36 animate-in fade-in zoom-in-95">
+                      <button onClick={() => { openEditModal(idx, place); setActiveMenuIdx(null); }} className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm flex items-center gap-2"><Pencil size={14}/> 編輯卡片</button>
+                      {idx > 0 && (
+                        <button onClick={() => {
+                          const newData = [...itineraryData];
+                          const places = [...newData[selectedDayIdx].places];
+                          [places[idx], places[idx-1]] = [places[idx-1], places[idx]];
+                          newData[selectedDayIdx].places = places;
+                          setItineraryData(newData);
+                          updateFirestoreItinerary(newData);
+                          setActiveMenuIdx(null);
+                        }} className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm flex items-center gap-2"><ChevronUp size={14}/> 往上移</button>
+                      )}
+                      {idx < currentDay.places.length - 1 && (
+                        <button onClick={() => {
+                          const newData = [...itineraryData];
+                          const places = [...newData[selectedDayIdx].places];
+                          [places[idx], places[idx+1]] = [places[idx+1], places[idx]];
+                          newData[selectedDayIdx].places = places;
+                          setItineraryData(newData);
+                          updateFirestoreItinerary(newData);
+                          setActiveMenuIdx(null);
+                        }} className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm flex items-center gap-2"><ChevronDown size={14}/> 往下移</button>
+                      )}
+                      <button onClick={() => { 
+                        showConfirm('刪除卡片', `確定要刪除「${place.name}」嗎？`, () => {
+                          const newData = [...itineraryData];
+                          newData[selectedDayIdx].places.splice(idx, 1);
+                          setItineraryData(newData);
+                          updateFirestoreItinerary(newData);
+                          showToast('已刪除卡片');
+                        });
+                        setActiveMenuIdx(null);
+                      }} className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-500 text-sm flex items-center gap-2"><Trash2 size={14}/> 刪除卡片</button>
+                    </div>
+                  )}
                 </div>
-                <button onClick={() => setActiveMenuIdx(activeMenuIdx === idx ? null : idx)} className="p-1 text-gray-300 hover:text-gray-600">
-                  <MoreVertical size={20} />
-                </button>
-                {activeMenuIdx === idx && (
-                  <div className="absolute right-4 top-12 bg-white shadow-xl border border-gray-100 rounded-2xl py-2 z-10 w-36 animate-in fade-in zoom-in-95">
-                    <button onClick={() => { openEditModal(idx, place); setActiveMenuIdx(null); }} className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm flex items-center gap-2"><Pencil size={14}/> 編輯卡片</button>
-                    {idx > 0 && (
-                      <button onClick={() => {
-                        const newData = [...itineraryData];
-                        const places = [...newData[selectedDayIdx].places];
-                        [places[idx], places[idx-1]] = [places[idx-1], places[idx]];
-                        newData[selectedDayIdx].places = places;
-                        setItineraryData(newData);
-                        updateFirestoreItinerary(newData);
-                        setActiveMenuIdx(null);
-                      }} className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm flex items-center gap-2"><ChevronUp size={14}/> 往上移</button>
-                    )}
-                    {idx < currentDay.places.length - 1 && (
-                      <button onClick={() => {
-                        const newData = [...itineraryData];
-                        const places = [...newData[selectedDayIdx].places];
-                        [places[idx], places[idx+1]] = [places[idx+1], places[idx]];
-                        newData[selectedDayIdx].places = places;
-                        setItineraryData(newData);
-                        updateFirestoreItinerary(newData);
-                        setActiveMenuIdx(null);
-                      }} className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm flex items-center gap-2"><ChevronDown size={14}/> 往下移</button>
-                    )}
-                    <button onClick={() => { 
-                      showConfirm('刪除卡片', `確定要刪除「${place.name}」嗎？`, () => {
-                        const newData = [...itineraryData];
-                        newData[selectedDayIdx].places.splice(idx, 1);
-                        setItineraryData(newData);
-                        updateFirestoreItinerary(newData);
-                        showToast('已刪除卡片');
-                      });
-                      setActiveMenuIdx(null);
-                    }} className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-500 text-sm flex items-center gap-2"><Trash2 size={14}/> 刪除卡片</button>
+                <p className={`text-sm mb-4 whitespace-pre-wrap leading-relaxed ${isStrategy ? 'text-orange-700' : 'text-gray-600'}`}>{place.description}</p>
+                
+                {place.badges && place.badges.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {place.badges.map((b: string) => <span key={b} className={`text-[10px] px-2 py-1 rounded-full font-bold ${getBadgeStyle(b)}`}>{b}</span>)}
+                  </div>
+                )}
+
+                {place.extraImages && (
+                  <div className="flex gap-2 overflow-x-auto pb-2 mb-4 hide-scrollbar">
+                    {place.extraImages.map((img: any, i: number) => (
+                      <img key={i} src={img.url} alt={img.title} className="h-20 w-32 object-cover rounded-xl border border-gray-100 cursor-pointer" onClick={() => setPreviewImage(img.url)} />
+                    ))}
+                  </div>
+                )}
+
+                {place.goshuins && (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {place.goshuins.map((gs: any, gIdx: number) => (
+                      <div key={gIdx} className="inline-flex items-center gap-1.5 bg-[#A39D78]/10 text-[#A39D78] px-2.5 py-1.5 rounded-xl text-[10px] font-bold border border-[#A39D78]/20 shadow-sm">
+                        ⛩️ {gs.name} ({gs.price})
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {place.gojoins && (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {place.gojoins.map((gj: any, gIdx: number) => (
+                      <div key={gIdx} className="inline-flex items-center gap-1.5 bg-[#773690]/10 text-[#773690] px-2.5 py-1.5 rounded-xl text-[10px] font-bold border border-[#773690]/20 shadow-sm">
+                        🏯 {gj.name} ({gj.price})
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="flex gap-2">
+                  <button onClick={() => handleAiExplore(place.name, place.type)} className="flex-1 bg-[#773690]/5 text-[#773690] py-2.5 rounded-xl text-xs font-bold hover:bg-[#773690]/10 transition-colors">
+                    {loadingTips[place.name] ? <Loader2 size={14} className="animate-spin mx-auto" /> : '✨ AI 探索'}
+                  </button>
+                  {!isStrategy && (
+                    <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name)}`} target="_blank" rel="noreferrer" className="flex-1 bg-gray-50 text-gray-500 py-2.5 rounded-xl text-xs font-bold text-center flex items-center justify-center gap-1">
+                      <Navigation size={14}/> 導航
+                    </a>
+                  )}
+                </div>
+                {aiTips[place.name] && (
+                  <div className="mt-4 p-4 bg-purple-50 rounded-2xl text-xs text-purple-700 border border-purple-100 animate-in slide-in-from-top-2">
+                    <div className="font-bold mb-1 flex items-center gap-1"><Info size={12}/> AI 建議</div>
+                    {aiTips[place.name]}
                   </div>
                 )}
               </div>
-              <p className={`text-sm mb-4 whitespace-pre-wrap leading-relaxed ${isStrategy ? 'text-orange-700' : 'text-gray-600'}`}>{place.description}</p>
-              
-              {place.badges && place.badges.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {place.badges.map((b: string) => <span key={b} className={`text-[10px] px-2 py-1 rounded-full font-bold ${getBadgeStyle(b)}`}>{b}</span>)}
-                </div>
-              )}
-
-              {place.extraImages && (
-                <div className="flex gap-2 overflow-x-auto pb-2 mb-4 hide-scrollbar">
-                  {place.extraImages.map((img: any, i: number) => (
-                    <img key={i} src={img.url} alt={img.title} className="h-20 w-32 object-cover rounded-xl border border-gray-100 cursor-pointer" onClick={() => setPreviewImage(img.url)} />
-                  ))}
-                </div>
-              )}
-
-              {place.goshuins && (
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {place.goshuins.map((gs: any, gIdx: number) => (
-                    <div key={gIdx} className="inline-flex items-center gap-1.5 bg-[#A39D78]/10 text-[#A39D78] px-2.5 py-1.5 rounded-xl text-[10px] font-bold border border-[#A39D78]/20 shadow-sm">
-                      ⛩️ {gs.name} ({gs.price})
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {place.gojoins && (
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {place.gojoins.map((gj: any, gIdx: number) => (
-                    <div key={gIdx} className="inline-flex items-center gap-1.5 bg-[#773690]/10 text-[#773690] px-2.5 py-1.5 rounded-xl text-[10px] font-bold border border-[#773690]/20 shadow-sm">
-                      🏯 {gj.name} ({gj.price})
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <div className="flex gap-2">
-                <button onClick={() => handleAiExplore(place.name, place.type)} className="flex-1 bg-[#773690]/5 text-[#773690] py-2.5 rounded-xl text-xs font-bold hover:bg-[#773690]/10 transition-colors">
-                  {loadingTips[place.name] ? <Loader2 size={14} className="animate-spin mx-auto" /> : '✨ AI 探索'}
-                </button>
-                {!isStrategy && (
-                  <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name)}`} target="_blank" rel="noreferrer" className="flex-1 bg-gray-50 text-gray-500 py-2.5 rounded-xl text-xs font-bold text-center flex items-center justify-center gap-1">
-                    <Navigation size={14}/> 導航
-                  </a>
-                )}
-              </div>
-              {aiTips[place.name] && (
-                <div className="mt-4 p-4 bg-purple-50 rounded-2xl text-xs text-purple-700 border border-purple-100 animate-in slide-in-from-top-2">
-                  <div className="font-bold mb-1 flex items-center gap-1"><Info size={12}/> AI 建議</div>
-                  {aiTips[place.name]}
-                </div>
-              )}
-            </div>
+              <InsertButton onClick={() => openEditModal(null, null, idx + 1)} />
+            </React.Fragment>
           );
         })}
-        <button onClick={() => openEditModal()} className="w-full py-5 border-2 border-dashed border-gray-200 rounded-[2rem] text-gray-400 font-bold hover:border-[#A39D78] hover:text-[#A39D78] transition-all flex items-center justify-center gap-2 bg-white/50">
-          <Plus size={20} /> 新增行程卡片
-        </button>
       </div>
 
       <div className="mt-10 mb-10">
@@ -448,7 +500,7 @@ const ItineraryView = ({
   );
 };
 
-const GuideView = ({ user, packingList, setPackingList, updateFirestore, showToast }: any) => {
+const GuideView = ({ user, packingList, setPackingList, updateFirestore, showToast, scrollRef }: any) => {
   const [newItem, setNewItem] = useState('');
   const [activeCat, setActiveCat] = useState('carryOn');
   const [translateInput, setTranslateInput] = useState('');
@@ -497,18 +549,35 @@ const GuideView = ({ user, packingList, setPackingList, updateFirestore, showToa
   };
 
   return (
-    <div className="h-full overflow-y-auto p-4 pb-24 hide-scrollbar">
-      <div className="grid grid-cols-4 gap-2 mb-6">
-        <button onClick={() => setEmergencyModal(true)} className="aspect-square bg-red-50 rounded-2xl flex flex-col items-center justify-center gap-1.5 border border-red-100 shadow-sm">
-          <Phone className="text-red-500" size={20}/>
-          <span className="text-[9px] font-bold text-red-600">緊急求助</span>
-        </button>
+    <div className="h-full overflow-y-auto p-4 pb-24 hide-scrollbar" ref={scrollRef}>
+      <button 
+        onClick={() => setEmergencyModal(true)} 
+        className="w-full bg-red-50 p-5 rounded-[2rem] flex items-center justify-center gap-4 border border-red-100 shadow-sm mb-4 group active:scale-[0.98] transition-all"
+      >
+        <div className="p-3 bg-white rounded-2xl text-red-500 shadow-sm group-hover:scale-110 transition-transform">
+          <Phone size={24}/>
+        </div>
+        <div className="text-left">
+          <div className="text-base font-bold text-red-600">緊急求助</div>
+          <div className="text-[11px] text-red-400">駐日代表處聯絡資訊</div>
+        </div>
+      </button>
+
+      <div className="flex gap-3 overflow-x-auto pb-4 mb-6 hide-scrollbar">
         {mockData.documents.map((doc: any, i: number) => {
           const Icon = getDocIconObj(doc.icon);
           return (
-            <a key={i} href={doc.url} target="_blank" rel="noreferrer" className={`aspect-square rounded-2xl flex flex-col items-center justify-center gap-1.5 border shadow-sm ${getDocColorClass(doc.icon)}`}>
-              <Icon size={20}/>
-              <span className="text-[9px] font-bold text-center px-1 truncate w-full">{doc.title}</span>
+            <a 
+              key={i} 
+              href={doc.url} 
+              target="_blank" 
+              rel="noreferrer" 
+              className="flex-shrink-0 flex items-center gap-3 px-5 py-4 bg-[#A39D78]/5 border border-[#A39D78]/10 rounded-2xl shadow-sm hover:bg-[#A39D78]/10 transition-all"
+            >
+              <div className="p-2 bg-white rounded-xl text-[#A39D78]">
+                <Icon size={20}/>
+              </div>
+              <span className="text-xs font-bold text-[#4A4737] whitespace-nowrap">{doc.title}</span>
             </a>
           );
         })}
@@ -598,17 +667,10 @@ const GuideView = ({ user, packingList, setPackingList, updateFirestore, showToa
             <div className="space-y-3 mb-6">
               <div className="p-4 bg-gray-50 rounded-2xl flex justify-between items-center">
                 <div>
-                  <div className="font-bold">台北駐日經濟文化代表處</div>
+                  <div className="font-bold text-[#4A4737]">台北駐日經濟文化代表處</div>
                   <div className="text-xs text-gray-400">+81 3 3280 7811</div>
                 </div>
-                <button onClick={() => { navigator.clipboard.writeText('+81332807811'); showToast('已複製電話'); }} className="p-2 bg-white rounded-full shadow-sm text-blue-500"><Copy size={16}/></button>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-2xl flex justify-between items-center">
-                <div>
-                  <div className="font-bold">日本緊急報警 (警察)</div>
-                  <div className="text-xs text-gray-400">110</div>
-                </div>
-                <a href="tel:110" className="p-2 bg-white rounded-full shadow-sm text-green-500"><Phone size={16}/></a>
+                <button onClick={() => { navigator.clipboard.writeText('+81332807811'); showToast('已複製電話'); }} className="p-3 bg-white rounded-full shadow-sm text-blue-500 hover:bg-blue-50 transition-colors"><Copy size={18}/></button>
               </div>
             </div>
             <button onClick={() => setEmergencyModal(false)} className="w-full py-4 bg-gray-100 rounded-2xl font-bold text-gray-500">關閉</button>
@@ -619,7 +681,7 @@ const GuideView = ({ user, packingList, setPackingList, updateFirestore, showToa
   );
 };
 
-const WeatherView = () => {
+const WeatherView = ({ scrollRef }: any) => {
   const forecast = [
     { day: '4/21', weekday: '二', temp: '15° / 22°', condition: 'Sunny', desc: '晴朗舒適', clothingHint: '薄長袖加上休閒外套' },
     { day: '4/22', weekday: '三', temp: '8° / 15°', condition: 'Rain', desc: '山區陣雨', clothingHint: '山區濕冷，需防水保暖外套' },
@@ -630,7 +692,7 @@ const WeatherView = () => {
   ];
 
   return (
-    <div className="h-full overflow-y-auto p-4 pb-24 hide-scrollbar">
+    <div className="h-full overflow-y-auto p-4 pb-24 hide-scrollbar" ref={scrollRef}>
       <h2 className="text-xl font-bold text-[#A39D78] mb-6 flex items-center gap-2 px-2"><Sun/> 每日天氣預測</h2>
       <div className="space-y-4">
         {forecast.map((w, i) => (
@@ -655,6 +717,10 @@ export default function App() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('itinerary');
+  const itineraryRef = useRef<HTMLDivElement>(null);
+  const guideRef = useRef<HTMLDivElement>(null);
+  const weatherRef = useRef<HTMLDivElement>(null);
+  
   const [itineraryData, setItineraryData] = useState(mockData.itinerary);
   const [packingList, setPackingList] = useState(defaultPackingList);
   const [dailyJournals, setDailyJournals] = useState({});
@@ -752,6 +818,7 @@ export default function App() {
             updateFirestoreItinerary={updateFirestoreItinerary}
             showToast={showToast}
             showConfirm={showConfirm}
+            scrollRef={itineraryRef}
           />
         )}
         {activeTab === 'guide' && (
@@ -760,9 +827,17 @@ export default function App() {
             packingList={packingList} setPackingList={setPackingList}
             updateFirestore={updateFirestorePacking}
             showToast={showToast}
+            scrollRef={guideRef}
           />
         )}
-        {activeTab === 'weather' && <WeatherView />}
+        {activeTab === 'weather' && <WeatherView scrollRef={weatherRef} />}
+
+        <ScrollToTop 
+          activeTab={activeTab} 
+          itineraryRef={itineraryRef} 
+          guideRef={guideRef} 
+          weatherRef={weatherRef} 
+        />
       </main>
 
       <nav className="bg-white border-t border-gray-100 flex justify-around p-4 pb-8 z-20 shadow-[0_-4px_20px_rgba(0,0,0,0.02)]">
